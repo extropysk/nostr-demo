@@ -1,0 +1,4 @@
+{
+  "extends": ["@extropysk/eslint-config-react"],
+  "ignorePatterns": ["./dist", "./node_modules"]
+}
