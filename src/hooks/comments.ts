@@ -1,4 +1,5 @@
 import { useBaseTag } from '@/hooks/base-tag'
+import { useEvent } from '@/hooks/event'
 import { useEvents } from '@/hooks/events'
 
 type Options = {
@@ -8,6 +9,16 @@ type Options = {
 
 export const useComments = ({ owner, customBase }: Options = {}) => {
   const { filter, reference } = useBaseTag(owner, customBase)
+  const { data } = useEvents(filter)
+  const { publish, error, loading } = useEvent()
 
-  return useEvents(filter, reference)
+  const handlePublish = (content: string) => {
+    if (!reference) {
+      return
+    }
+
+    publish(content, [reference])
+  }
+
+  return { data: data ?? [], publish: handlePublish, error, loading }
 }

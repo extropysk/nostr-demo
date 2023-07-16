@@ -1,6 +1,6 @@
 import { nip19 } from 'nostr-tools'
 
-export type Tag = '#e' | '#p' | '#a'
+export type Tag = '#e' | '#p' | '#a' | '#r'
 
 export type Filter = {
   ids?: string[]

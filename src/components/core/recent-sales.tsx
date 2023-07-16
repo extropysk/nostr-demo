@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Metadata, useMetadata } from '@/hooks/metadata'
+import { useMetadata } from '@/hooks/metadata'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Event, nip19 } from 'nostr-tools'
@@ -9,7 +9,7 @@ type Props = {
   event: Event
 }
 
-export function formatName(pubkey: string, meta?: Metadata) {
+export function formatName(pubkey: string, meta?: Record<string, string>) {
   if (meta) {
     if (meta.nip05) {
       if (meta.nip05.startsWith('_@')) return meta.nip05.slice(2)
