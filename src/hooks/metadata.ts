@@ -1,7 +1,6 @@
 import { useNostr } from '@/hooks/nostr'
 import { db } from '@/utils/db'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Event } from 'nostr-tools'
 import { useEffect, useMemo } from 'react'
 
 const set = new Set()
@@ -15,7 +14,7 @@ export const useMetadata = (pubkey: string) => {
   useEffect(() => {
     if (metadata?.length === 0 && !set.has(pubkey)) {
       set.add(pubkey)
-      pool.get(relays, { kinds: [0], authors: [pubkey] }).then((event: Event) => {
+      pool.get(relays, { kinds: [0], authors: [pubkey] }).then((event) => {
         if (event) {
           db.events.put(event)
         }
