@@ -1,4 +1,12 @@
-import { Event } from 'nostr-tools'
+import { Event, UnsignedEvent, getEventHash, getSignature } from 'nostr-tools'
+
+export function signEvent(unsignedEvent: UnsignedEvent, privateKey: string): Event {
+  return {
+    ...unsignedEvent,
+    id: getEventHash(unsignedEvent),
+    sig: getSignature(unsignedEvent, privateKey),
+  }
+}
 
 export function insertEventIntoDescendingList(sortedArray: Event[], event: Event): Event[] {
   let start = 0

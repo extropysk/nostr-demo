@@ -1,16 +1,8 @@
-import {
-  Event,
-  generatePrivateKey,
-  getEventHash,
-  getPublicKey,
-  signEvent,
-  SimplePool,
-  UnsignedEvent,
-} from 'nostr-tools'
+import { signEvent } from '@/utils/nostr'
+import { Event, generatePrivateKey, getPublicKey, SimplePool, UnsignedEvent } from 'nostr-tools'
 import { createContext, ReactNode, useContext, useRef, useState } from 'react'
 
 const RELAYS = ['wss://relay.damus.io']
-const SK = '0704966fd2c87c5fd763ebc034f05950935c1ab919dab242691b76b4d90ae71c'
 
 type Context = {
   publicKey?: string
@@ -18,7 +10,6 @@ type Context = {
   establishNostrKey: () => Promise<void>
   pool: SimplePool
   relays: string[]
-  sk: string
 }
 
 const NostrContext = createContext({} as Context)
@@ -32,12 +23,7 @@ export function NostrProvider({ children }: { children: ReactNode }) {
   async function signEventAsync(unsignedEvent: UnsignedEvent): Promise<Event> {
     // if we have a private key that means it was generated locally and we don't have a nip07 extension
     if (privateKey) {
-      const event: Event = {
-        ...unsignedEvent,
-        id: getEventHash(unsignedEvent),
-        sig: signEvent(unsignedEvent, privateKey),
-      }
-      return event
+      return signEvent(unsignedEvent, privateKey)
     } else {
       return await window.nostr.signEvent(unsignedEvent)
     }
@@ -72,7 +58,6 @@ export function NostrProvider({ children }: { children: ReactNode }) {
         signEventAsync,
         pool: poolRef.current,
         relays: RELAYS,
-        sk: SK,
       }}
     >
       {children}

@@ -55,7 +55,6 @@ export const useEvents = (filter?: Filter) => {
       .filter((e) =>
         filterEvents(e, {
           ...filter,
-          kinds: [1],
         })
       )
       .limit(filter.limit ?? 100)
@@ -74,7 +73,6 @@ export const useEvents = (filter?: Filter) => {
 
     const f = {
       ...filter,
-      kinds: [1],
       since,
     }
     console.log('sub', f)

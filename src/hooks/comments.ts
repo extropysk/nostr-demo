@@ -8,16 +8,16 @@ type Options = {
 }
 
 export const useComments = ({ owner, customBase }: Options = {}) => {
-  const { filter, reference } = useBaseTag(owner, customBase)
-  const { data } = useEvents(filter)
+  const baseTag = useBaseTag(owner, customBase)
+  const { data } = useEvents(baseTag?.filter)
   const { publish, error, loading } = useEvent()
 
   const handlePublish = (content: string) => {
-    if (!reference) {
+    if (!baseTag?.reference) {
       return
     }
 
-    publish(content, [reference])
+    publish(content, [baseTag.reference], 1)
   }
 
   return { data: data ?? [], publish: handlePublish, error, loading }

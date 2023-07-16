@@ -1,6 +1,6 @@
 import { Error, ErrorCode } from '@/enums/error-code'
 import { useNostr } from '@/hooks/nostr'
-import { Event, UnsignedEvent } from 'nostr-tools'
+import { Event, Kind, UnsignedEvent } from 'nostr-tools'
 import { useState } from 'react'
 
 export const useEvent = () => {
@@ -8,7 +8,7 @@ export const useEvent = () => {
   const [error, setError] = useState<Error>()
   const [loading, setLoading] = useState(false)
 
-  const publish = async (content: string, tags: string[][]) => {
+  const publish = async (content: string, tags: string[][], kind: Kind) => {
     if (!publicKey) {
       setError({ code: ErrorCode.PublicKeyNotFound, message: 'Please login' })
       return
@@ -20,7 +20,7 @@ export const useEvent = () => {
     const unsignedEvent: UnsignedEvent = {
       pubkey: publicKey,
       created_at: Math.round(Date.now() / 1000),
-      kind: 1,
+      kind,
       tags,
       content,
     }

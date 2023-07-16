@@ -30,8 +30,8 @@ export const decodeOwner = (owner?: string) => {
   return ownerTag
 }
 
-export const decodeBaseTag = (customBase?: string): BaseTag => {
-  let customBaseTag: BaseTag = {}
+export const decodeBaseTag = (customBase?: string) => {
+  let customBaseTag: BaseTag | undefined
   if (customBase) {
     try {
       const { type, data } = nip19.decode(customBase)
