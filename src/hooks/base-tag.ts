@@ -1,6 +1,6 @@
 import { useNostr } from '@/hooks/nostr'
 import { useDidMount } from '@/hooks/useDidMount'
-import { decodeBaseTag, decodeOwner } from '@/utils/nip19'
+import { BaseTag, decodeBaseTag, decodeOwner } from '@/utils/nip19'
 import { normalizeURL } from '@/utils/string'
 import { Event, UnsignedEvent, getEventHash, getPublicKey, signEvent } from 'nostr-tools'
 import { useState } from 'react'
@@ -8,10 +8,10 @@ import { useState } from 'react'
 export const useBaseTag = (owner?: string, customBase?: string) => {
   const { pool, relays, sk } = useNostr()
 
-  const [baseTag, setBaseTag] = useState(decodeBaseTag(customBase))
+  const [baseTag, setBaseTag] = useState<BaseTag>(decodeBaseTag(customBase))
 
   useDidMount(async () => {
-    if (baseTag) {
+    if (customBase) {
       return
     }
     const url = normalizeURL(location.href)
@@ -64,5 +64,5 @@ export const useBaseTag = (owner?: string, customBase?: string) => {
       })
   })
 
-  return { baseTag }
+  return baseTag
 }

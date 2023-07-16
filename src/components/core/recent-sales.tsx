@@ -11,7 +11,7 @@ type Props = {
 
 export function formatName(pubkey: string, meta?: Metadata) {
   if (meta) {
-    if (meta.nip05 && meta.nip05verified) {
+    if (meta.nip05) {
       if (meta.nip05.startsWith('_@')) return meta.nip05.slice(2)
       return meta.nip05
     }
