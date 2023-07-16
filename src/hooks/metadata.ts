@@ -1,31 +1,32 @@
 import { useNostr } from '@/hooks/nostr'
 import { db } from '@/utils/db'
-import { useEffect, useState } from 'react'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { useEffect, useMemo } from 'react'
 
-export type Metadata = Record<string, string>
-
+const set = new Set()
 export const useMetadata = (pubkey: string) => {
   const { pool, relays } = useNostr()
-  const [data, setData] = useState<Metadata>()
+
+  const metadata = useLiveQuery(async () => {
+    return await db.events.where({ kind: 0, pubkey }).limit(1).toArray()
+  }, [pubkey])
 
   useEffect(() => {
-    const fetch = async () => {
-      let event = await db.events.where({ kind: 0, pubkey }).first()
-      if (!event || Date.now() / 1000 - event.created_at > 3600) {
-        const e = await pool.get(relays, { kinds: [0], authors: [pubkey] })
-        if (e) {
-          await db.events.put(e)
-          event = e
+    if (metadata?.length === 0 && !set.has(pubkey)) {
+      set.add(pubkey)
+      pool.get(relays, { kinds: [0], authors: [pubkey] }).then((event) => {
+        if (event) {
+          db.events.put(event)
         }
-      }
-
-      if (event) {
-        setData(JSON.parse(event.content))
-      }
+      })
     }
+  }, [metadata, pool, pubkey, relays])
 
-    fetch()
-  }, [pool, pubkey, relays])
+  const data = useMemo(() => {
+    if (metadata?.length) {
+      return JSON.parse(metadata[0].content)
+    }
+  }, [metadata])
 
   return { data }
 }
