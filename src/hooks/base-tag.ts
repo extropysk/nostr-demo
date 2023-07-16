@@ -21,10 +21,11 @@ export const useBaseTag = (owner?: string, customBase?: string) => {
       limit: 3,
     }
   }, [url, customBase])
+
   const { data } = useEvents(filter)
 
   useEffect(() => {
-    if (customBase || !data) {
+    if (baseTag.filter || baseTag.reference || !data) {
       return
     }
 
@@ -53,7 +54,7 @@ export const useBaseTag = (owner?: string, customBase?: string) => {
       }
       pool.publish(relays, rootEvent)
     }
-  }, [data, pool, owner, url, sk, relays, customBase])
+  }, [baseTag.filter, baseTag.reference, data, owner, pool, relays, sk, url])
 
   return baseTag
 }
