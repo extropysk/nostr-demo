@@ -18,7 +18,6 @@ export const useBaseTag = (owner?: string, customBase?: string) => {
 
     return {
       '#r': [url],
-      limit: 3,
     }
   }, [url, customBase])
 

@@ -1,8 +1,10 @@
 import { useNostr } from '@/hooks/nostr'
 import { DbEvent, db } from '@/utils/db'
-import { Filter, Tag } from '@/utils/nip19'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { Filter } from 'nostr-tools'
 import { useEffect, useState } from 'react'
+
+type Tag = `#${string}`
 
 const filterEvents = (event: DbEvent, filter: Filter) => {
   let predicate = true
@@ -70,13 +72,13 @@ export const useEvents = (filter?: Filter) => {
   useEffect(() => {
     if (!filter || !since) return
 
-    const sub = pool.sub(relays, [
-      {
-        ...filter,
-        kinds: [1],
-        since,
-      },
-    ])
+    const f = {
+      ...filter,
+      kinds: [1],
+      since,
+    }
+    console.log('sub', f)
+    const sub = pool.sub(relays, [f])
 
     sub.on('event', async (event) => {
       await db.events.put(event)

@@ -1,15 +1,4 @@
-import { nip19 } from 'nostr-tools'
-
-export type Tag = '#e' | '#p' | '#a' | '#r'
-
-export type Filter = {
-  ids?: string[]
-  authors?: string[]
-  kinds?: number[]
-  since?: number
-  until?: number
-  limit?: number
-} & { [key in Tag]?: string[] }
+import { Filter, nip19 } from 'nostr-tools'
 
 export type BaseTag = {
   filter?: Filter
