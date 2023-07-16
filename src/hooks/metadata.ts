@@ -1,22 +1,32 @@
 import { useNostr } from '@/hooks/nostr'
-import { isNip05verified } from '@/utils/nip05'
-import { useEffect, useState } from 'react'
+import { db } from '@/utils/db'
+import { useLiveQuery } from 'dexie-react-hooks'
+import { useEffect, useMemo } from 'react'
 
-export type Metadata = Record<string, string>
-
+const set = new Set()
 export const useMetadata = (pubkey: string) => {
   const { pool, relays } = useNostr()
-  const [data, setData] = useState<Metadata>()
+
+  const metadata = useLiveQuery(async () => {
+    return await db.events.where({ kind: 0, pubkey }).limit(1).toArray()
+  }, [pubkey])
 
   useEffect(() => {
-    pool.list(relays, [{ kinds: [0], authors: [pubkey] }]).then(async (res) => {
-      if (res.length) {
-        const meta = JSON.parse(res[0].content)
-        meta.nip05verified = await isNip05verified(pubkey, meta.nip05)
-        setData(meta)
-      }
-    })
-  }, [pool, pubkey, relays])
+    if (metadata?.length === 0 && !set.has(pubkey)) {
+      set.add(pubkey)
+      pool.get(relays, { kinds: [0], authors: [pubkey] }).then((event) => {
+        if (event) {
+          db.events.put(event)
+        }
+      })
+    }
+  }, [metadata, pool, pubkey, relays])
+
+  const data = useMemo(() => {
+    if (metadata?.length) {
+      return JSON.parse(metadata[0].content)
+    }
+  }, [metadata])
 
   return { data }
 }

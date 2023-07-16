@@ -1,68 +1,59 @@
+import { useEvents } from '@/hooks/events'
 import { useNostr } from '@/hooks/nostr'
-import { useDidMount } from '@/hooks/useDidMount'
-import { decodeBaseTag, decodeOwner } from '@/utils/nip19'
+import { BaseTag, decodeBaseTag, decodeOwner } from '@/utils/nip19'
 import { normalizeURL } from '@/utils/string'
 import { Event, UnsignedEvent, getEventHash, getPublicKey, signEvent } from 'nostr-tools'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export const useBaseTag = (owner?: string, customBase?: string) => {
-  const { pool, relays, sk } = useNostr()
+  const { pool, sk, relays } = useNostr()
 
-  const [baseTag, setBaseTag] = useState(decodeBaseTag(customBase))
+  const [baseTag, setBaseTag] = useState<BaseTag>(decodeBaseTag(customBase))
 
-  useDidMount(async () => {
-    if (baseTag) {
+  const url = normalizeURL(location.href)
+  const filter = useMemo(() => {
+    if (customBase) {
       return
     }
-    const url = normalizeURL(location.href)
 
-    // search for the base event based on the #r tag (url)
-    pool
-      .list(relays, [
-        {
-          '#r': [url],
-          kinds: [1],
-        },
-      ])
-      .then((events) => {
-        if (events.length === 0) {
-          const ownerTag = decodeOwner(owner)
-          const tags = [['r', url]]
-          if (ownerTag) {
-            tags.push(ownerTag)
-          }
-          const unsignedRootEvent: UnsignedEvent = {
-            pubkey: getPublicKey(sk),
-            created_at: Math.round(Date.now() / 1000),
-            kind: 1,
-            tags: tags,
-            content: `Comments on ${url}` + (ownerTag ? ` by #[1]` : '') + ` ↴`,
-          }
-          const rootEvent: Event = {
-            ...unsignedRootEvent,
-            id: getEventHash(unsignedRootEvent),
-            sig: signEvent(unsignedRootEvent, sk),
-          }
-          const reference = ['e', rootEvent.id, '', 'root']
-          setBaseTag({ filter: { '#e': [rootEvent.id] }, reference })
+    return {
+      '#r': [url],
+      limit: 3,
+    }
+  }, [url, customBase])
+  const { data } = useEvents(filter)
 
-          pool.publish(relays, rootEvent)
-          //   setBaseTag((prev) => {
-          //     reference[2] = pool.seenOn(root.id)[0]
+  useEffect(() => {
+    if (customBase || !data) {
+      return
+    }
 
-          //     return {
-          //       filter: { '#e': [root.id] },
-          //       reference: reference,
-          //     }
-          //   })
-        } else {
-          setBaseTag({
-            filter: { '#e': events.slice(0, 3).map((event) => event.id) },
-            reference: ['e', events[0].id, pool.seenOn(events[0].id)[0], 'root'],
-          })
-        }
+    if (data.length) {
+      setBaseTag({
+        filter: { '#e': data.map((event) => event.id) },
+        reference: ['e', data[0].id, pool.seenOn(data[0].id)[0], 'root'],
       })
-  })
+    } else {
+      const ownerTag = decodeOwner(owner)
+      const tags = [['r', url]]
+      if (ownerTag) {
+        tags.push(ownerTag)
+      }
+      const unsignedRootEvent: UnsignedEvent = {
+        pubkey: getPublicKey(sk),
+        created_at: Math.round(Date.now() / 1000),
+        kind: 1,
+        tags: tags,
+        content: `Comments on ${url}` + (ownerTag ? ` by #[1]` : '') + ` ↴`,
+      }
+      const rootEvent: Event = {
+        ...unsignedRootEvent,
+        id: getEventHash(unsignedRootEvent),
+        sig: signEvent(unsignedRootEvent, sk),
+      }
+      pool.publish(relays, rootEvent)
+    }
+  }, [data, pool, owner, url, sk, relays, customBase])
 
-  return { baseTag }
+  return baseTag
 }
