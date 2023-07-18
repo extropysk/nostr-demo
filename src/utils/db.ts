@@ -9,7 +9,7 @@ export class Db extends Dexie {
   constructor() {
     super('db')
     this.version(1).stores({
-      events: '&id, [kind+pubkey], created_at',
+      events: '&id, [kind+pubkey], [kind+pubkey+id], created_at',
     })
   }
 }

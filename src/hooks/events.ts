@@ -1,5 +1,6 @@
 import { useNostr } from '@/hooks/nostr'
 import { db, filterEvents } from '@/utils/db'
+import { getRefs } from '@/utils/nostr'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Filter } from 'nostr-tools'
 import { useEffect, useState } from 'react'
@@ -38,14 +39,25 @@ export const useEvents = (filter?: Filter) => {
 
     const subFilter: Filter = {
       ...filter,
-      kinds: [1],
+      kinds: [1, 5],
       since,
     }
     console.log('sub', subFilter)
     const sub = pool.sub(relays, [subFilter])
 
     sub.on('event', async (event) => {
-      await db.events.put(event)
+      switch (event.kind) {
+        case 1:
+          db.events.put(event)
+          break
+        case 5:
+          const refs = getRefs(event, true)
+          db.events.where('[kind+pubkey+id]').anyOf(refs).delete()
+          break
+        default:
+          console.log('unprocessed event', event)
+          break
+      }
     })
 
     return () => {
