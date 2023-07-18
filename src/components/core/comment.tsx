@@ -1,3 +1,4 @@
+import { Menu } from '@/components/core/menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useMetadata } from '@/hooks/metadata'
 import dayjs from 'dayjs'
@@ -7,6 +8,8 @@ dayjs.extend(relativeTime)
 
 type Props = {
   event: Event
+  onDelete: (event: Event) => void
+  isDisabled: (event: Event) => boolean
 }
 
 export function formatName(pubkey: string, meta?: Record<string, string>) {
@@ -22,7 +25,7 @@ export function formatName(pubkey: string, meta?: Record<string, string>) {
   return `${npub.slice(0, 6)}…${npub.slice(-3)}`
 }
 
-export function RecentSales({ event }: Props) {
+export function Comment({ event, onDelete, isDisabled }: Props) {
   const { data } = useMetadata(event.pubkey)
 
   return (
@@ -33,11 +36,12 @@ export function RecentSales({ event }: Props) {
       </Avatar>
       <div className="ml-4 space-y-1 w-full">
         <p className="text-sm font-medium leading-none">{event.content}</p>
-        <div className="text-sm text-muted-foreground flex justify-between space-x-4">
-          <p>{formatName(event.pubkey, data)}</p>
-          <p>{dayjs(event.created_at * 1000).from(new Date())}</p>
+        <div className="text-sm text-muted-foreground">
+          <span className="mr-2">{formatName(event.pubkey, data)}</span>
+          <span>{dayjs(event.created_at * 1000).from(new Date())}</span>
         </div>
       </div>
+      <Menu onDelete={() => onDelete(event)} disabled={isDisabled(event)} />
     </div>
   )
 }

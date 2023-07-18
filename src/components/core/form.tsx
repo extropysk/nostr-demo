@@ -29,7 +29,7 @@ export function Form({ onSubmit, disabled }: Props) {
           placeholder="comment"
           onChange={(event) => setContent(event.target.value)}
           value={content}
-          disabled={disabled || !publicKey}
+          disabled={disabled}
         />
         {publicKey ? (
           <Button type="submit" disabled={disabled}>

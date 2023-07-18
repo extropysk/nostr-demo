@@ -3,12 +3,19 @@ import { useNostr } from '@/hooks/nostr'
 import { Event, Kind, UnsignedEvent } from 'nostr-tools'
 import { useState } from 'react'
 
+type Params = {
+  content: string
+  tags: string[][]
+  kind: Kind
+  onSuccess?: () => void
+}
+
 export const useEvent = () => {
   const { publicKey, signEventAsync, pool, relays } = useNostr()
   const [error, setError] = useState<Error>()
   const [loading, setLoading] = useState(false)
 
-  const publish = async (content: string, tags: string[][], kind: Kind) => {
+  const publish = async ({ content, tags, kind, onSuccess }: Params) => {
     if (!publicKey) {
       setError({ code: ErrorCode.PublicKeyNotFound, message: 'Please login' })
       return
@@ -49,6 +56,7 @@ export const useEvent = () => {
     const pub = pool.publish(relays, event)
     pub.on('ok', (relay: string) => {
       clearTimeout(publishTimeout)
+      onSuccess?.()
       console.log(`event ${event.id.slice(0, 5)}… published to ${relay}.`)
       setLoading(false)
     })
