@@ -19,6 +19,7 @@ export const useEvents = (filter?: Filter) => {
       .filter((e) =>
         filterEvents(e, {
           ...filter,
+          kinds: [1],
         })
       )
       .limit(filter.limit ?? 100)
@@ -35,12 +36,13 @@ export const useEvents = (filter?: Filter) => {
   useEffect(() => {
     if (!filter || !since) return
 
-    const f = {
+    const subFilter: Filter = {
       ...filter,
+      kinds: [1],
       since,
     }
-    console.log('sub', f)
-    const sub = pool.sub(relays, [f])
+    console.log('sub', subFilter)
+    const sub = pool.sub(relays, [subFilter])
 
     sub.on('event', async (event) => {
       await db.events.put(event)

@@ -8,17 +8,9 @@ import { useEffect, useState } from 'react'
 
 const SK = '0704966fd2c87c5fd763ebc034f05950935c1ab919dab242691b76b4d90ae71c'
 
-function initBaseTag(customBase?: string) {
-  const baseTag = decodeBaseTag(customBase)
-  if (baseTag) {
-    baseTag.filter = { ...baseTag.filter, kinds: [1] }
-  }
-  return baseTag
-}
-
 export const useBaseTag = (owner?: string, customBase?: string) => {
   const { pool, relays } = useNostr()
-  const [baseTag, setBaseTag] = useState<BaseTag | undefined>(initBaseTag(customBase))
+  const [baseTag, setBaseTag] = useState<BaseTag | undefined>(decodeBaseTag(customBase))
 
   useEffect(() => {
     const fetch = async () => {
@@ -42,7 +34,7 @@ export const useBaseTag = (owner?: string, customBase?: string) => {
 
       if (data.length) {
         setBaseTag({
-          filter: { '#e': data.map((event) => event.id), kinds: [1] },
+          filter: { '#e': data.map((event) => event.id) },
           reference: ['e', data[0].id, pool.seenOn(data[0].id)[0], 'root'],
         })
       } else {
@@ -60,7 +52,7 @@ export const useBaseTag = (owner?: string, customBase?: string) => {
         }
         const rootEvent = signEvent(unsignedRootEvent, SK)
         setBaseTag({
-          filter: { '#e': [rootEvent.id], kinds: [1] },
+          filter: { '#e': [rootEvent.id] },
           reference: ['e', rootEvent.id, '', 'root'],
         })
         pool.publish(relays, rootEvent)
