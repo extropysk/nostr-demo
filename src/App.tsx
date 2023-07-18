@@ -1,6 +1,6 @@
-import { Comment } from '@/components/core/comment'
-import { ErrorHandler } from '@/components/core/error-handler'
-import { Form } from '@/components/core/form'
+import { ErrorHandler } from '@/components/comment/error-handler'
+import { Form } from '@/components/comment/form'
+import { Item } from '@/components/comment/item'
 import { useComments } from '@/hooks/comments'
 import { useNostr } from '@/hooks/nostr'
 import { Event } from 'nostr-tools'
@@ -22,7 +22,7 @@ function App() {
         <ErrorHandler error={error} />
         <div className="space-y-4">
           {data.map((event) => (
-            <Comment key={event.id} event={event} onDelete={del} isDisabled={isDisabled} />
+            <Item key={event.id} event={event} onDelete={del} isDisabled={isDisabled} />
           ))}
         </div>
       </div>

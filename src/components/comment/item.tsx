@@ -1,4 +1,4 @@
-import { Menu } from '@/components/core/menu'
+import { Menu } from '@/components/comment/menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useMetadata } from '@/hooks/metadata'
 import dayjs from 'dayjs'
@@ -25,7 +25,7 @@ export function formatName(pubkey: string, meta?: Record<string, string>) {
   return `${npub.slice(0, 6)}…${npub.slice(-3)}`
 }
 
-export function Comment({ event, onDelete, isDisabled }: Props) {
+export function Item({ event, onDelete, isDisabled }: Props) {
   const { data } = useMetadata(event.pubkey)
 
   return (
