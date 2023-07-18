@@ -8,40 +8,18 @@ export function signEvent(unsignedEvent: UnsignedEvent, privateKey: string): Eve
   }
 }
 
-export function insertEventIntoDescendingList(sortedArray: Event[], event: Event): Event[] {
-  let start = 0
-  let end = sortedArray.length - 1
-  let midPoint
-  let position = start
+export function getRefs(event: Event, checkPubkey = false) {
+  const refs = event.tags
+    .filter((tag) => tag[0] === 'a')
+    .map((a) => {
+      const ref: (number | string)[] = a[1].split(':')
+      ref[0] = Number(ref[0])
+      return ref
+    })
 
-  if (end < 0) {
-    position = 0
-  } else if (event.created_at < sortedArray[end].created_at) {
-    position = end + 1
-  } else if (event.created_at >= sortedArray[start].created_at) {
-    position = start
-  } else
-    while (true) {
-      if (end <= start + 1) {
-        position = end
-        break
-      }
-      midPoint = Math.floor(start + (end - start) / 2)
-      if (sortedArray[midPoint].created_at > event.created_at) {
-        start = midPoint
-      } else if (sortedArray[midPoint].created_at < event.created_at) {
-        end = midPoint
-      } else {
-        // aMidPoint === num
-        position = midPoint
-        break
-      }
-    }
-
-  // insert when num is NOT already in (no duplicates)
-  if (sortedArray[position]?.id !== event.id) {
-    return [...sortedArray.slice(0, position), event, ...sortedArray.slice(position)]
+  if (checkPubkey) {
+    return refs.filter((ref) => ref[1] === event.pubkey)
   }
 
-  return sortedArray
+  return refs
 }

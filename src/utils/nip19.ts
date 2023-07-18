@@ -1,8 +1,8 @@
 import { Filter, nip19 } from 'nostr-tools'
 
 export type BaseTag = {
-  filter?: Filter
-  reference?: string[]
+  filter: Filter
+  reference: string[]
 }
 
 export const decodeOwner = (owner?: string) => {

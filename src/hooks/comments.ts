@@ -1,7 +1,6 @@
 import { useBaseTag } from '@/hooks/base-tag'
 import { useEvent } from '@/hooks/event'
 import { useEvents } from '@/hooks/events'
-import { db } from '@/utils/db'
 import { Event } from 'nostr-tools'
 
 type Options = {
@@ -32,12 +31,15 @@ export const useComments = ({ owner, customBase }: Options = {}) => {
       ['a', `${event.kind}:${event.pubkey}:${event.id}`],
     ]
 
+    if (baseTag) {
+      tags.push(baseTag.reference)
+    }
+
     const content = `delete event ${event.id}`
     publish({
       content,
       tags,
       kind: 5,
-      onSuccess: () => db.events.delete(event.id),
     })
   }
 

@@ -7,7 +7,6 @@ type Params = {
   content: string
   tags: string[][]
   kind: Kind
-  onSuccess?: () => void
 }
 
 export const useEvent = () => {
@@ -15,7 +14,7 @@ export const useEvent = () => {
   const [error, setError] = useState<Error>()
   const [loading, setLoading] = useState(false)
 
-  const publish = async ({ content, tags, kind, onSuccess }: Params) => {
+  const publish = async ({ content, tags, kind }: Params) => {
     if (!publicKey) {
       setError({ code: ErrorCode.PublicKeyNotFound, message: 'Please login' })
       return
@@ -48,7 +47,7 @@ export const useEvent = () => {
     const publishTimeout = setTimeout(() => {
       setError({
         code: ErrorCode.PublishFailed,
-        message: `failed to publish event ${event.id.slice(0, 5)}… to any relay.`,
+        message: `failed to publish event to any relay.`,
       })
       setLoading(false)
     }, 8000)
@@ -56,12 +55,11 @@ export const useEvent = () => {
     const pub = pool.publish(relays, event)
     pub.on('ok', (relay: string) => {
       clearTimeout(publishTimeout)
-      onSuccess?.()
-      console.log(`event ${event.id.slice(0, 5)}… published to ${relay}.`)
+      console.log(`event ${event.id} published to ${relay}.`)
       setLoading(false)
     })
     pub.on('failed', (relay: string) => {
-      console.error(`failed to publish event ${event.id.slice(0, 5)}… to relay ${relay}`)
+      console.error(`failed to publish event to relay ${relay}`)
     })
   }
 
