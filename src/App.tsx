@@ -1,4 +1,3 @@
-import { ErrorHandler } from '@/components/comment/error-handler'
 import { Form } from '@/components/comment/form'
 import { Item } from '@/components/comment/item'
 import { useComments } from '@/hooks/comments'
@@ -17,10 +16,9 @@ function App() {
 
   return (
     <div className="flex justify-center p-4">
-      <div className="w-full max-w-sm space-y-2">
-        <Form onSubmit={publish} disabled={loading || !publicKey} />
-        <ErrorHandler error={error} />
-        <div className="space-y-4">
+      <div className="w-full max-w-sm space-y-4">
+        <Form onSubmit={publish} disabled={loading || !publicKey} error={error} />
+        <div className="space-y-2">
           {data.map((event) => (
             <Item key={event.id} event={event} onDelete={del} isDisabled={isDisabled} />
           ))}

@@ -6,7 +6,7 @@ type Props = {
 
 export function ErrorHandler({ error }: Props) {
   if (!error) {
-    return
+    return <div></div>
   }
   return (
     <div className="text-sm text-destructive flex justify-between space-x-4">{error.message}</div>

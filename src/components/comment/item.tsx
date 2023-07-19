@@ -1,5 +1,6 @@
 import { Menu } from '@/components/comment/menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { useMetadata } from '@/hooks/metadata'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -29,19 +30,25 @@ export function Item({ event, onDelete, isDisabled }: Props) {
   const { data } = useMetadata(event.pubkey)
 
   return (
-    <div className="flex items-center">
-      <Avatar className="h-9 w-9">
-        <AvatarImage src={data?.picture} alt="Avatar" />
-        <AvatarFallback>?</AvatarFallback>
-      </Avatar>
-      <div className="ml-4 space-y-1 w-full">
-        <p className="text-sm font-medium leading-none">{event.content}</p>
-        <div className="text-sm text-muted-foreground">
-          <span className="mr-2">{formatName(event.pubkey, data)}</span>
-          <span>{dayjs(event.created_at * 1000).from(new Date())}</span>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center">
+          <Avatar className="h-9 w-9">
+            <AvatarImage src={data?.picture} alt="Avatar" />
+            <AvatarFallback>?</AvatarFallback>
+          </Avatar>
+          <div className="ml-4 space-y-1 w-full">
+            <p className="text-sm font-medium leading-none">{formatName(event.pubkey, data)}</p>
+            <p className="text-sm text-muted-foreground">
+              {dayjs(event.created_at * 1000).from(new Date())}
+            </p>
+          </div>
         </div>
-      </div>
-      <Menu onDelete={() => onDelete(event)} disabled={isDisabled(event)} />
-    </div>
+      </CardHeader>
+      <CardContent>{event.content}</CardContent>
+      <CardFooter className="justify-end">
+        <Menu onDelete={() => onDelete(event)} disabled={isDisabled(event)} />
+      </CardFooter>
+    </Card>
   )
 }

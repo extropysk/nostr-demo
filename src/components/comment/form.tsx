@@ -1,14 +1,17 @@
+import { ErrorHandler } from '@/components/comment/error-handler'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Error } from '@/enums/error-code'
 import { useNostr } from '@/hooks/nostr'
 import { useState } from 'react'
 
 type Props = {
   onSubmit: (content: string) => void
   disabled?: boolean
+  error?: Error
 }
 
-export function Form({ onSubmit, disabled }: Props) {
+export function Form({ onSubmit, disabled, error }: Props) {
   const [content, setContent] = useState('')
   const { publicKey, establishNostrKey } = useNostr()
 
@@ -23,14 +26,15 @@ export function Form({ onSubmit, disabled }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="flex items-center space-x-2">
-        <Input
-          placeholder="comment"
-          onChange={(event) => setContent(event.target.value)}
-          value={content}
-          disabled={disabled}
-        />
+    <form onSubmit={handleSubmit} className="space-y-2">
+      <Textarea
+        placeholder="comment"
+        onChange={(event) => setContent(event.target.value)}
+        value={content}
+        disabled={disabled}
+      />
+      <div className="flex justify-between items-center">
+        <ErrorHandler error={error} />
         {publicKey ? (
           <Button type="submit" disabled={disabled}>
             Send
