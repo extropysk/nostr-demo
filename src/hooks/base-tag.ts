@@ -6,10 +6,8 @@ import { normalizeURL } from '@/utils/string'
 import { UnsignedEvent, getPublicKey } from 'nostr-tools'
 import { useEffect, useState } from 'react'
 
-const SK = '0704966fd2c87c5fd763ebc034f05950935c1ab919dab242691b76b4d90ae71c'
-
 export const useBaseTag = (owner?: string, customBase?: string) => {
-  const { pool, relays } = useNostr()
+  const { pool, relays, sk } = useNostr()
   const [baseTag, setBaseTag] = useState<BaseTag | undefined>(decodeBaseTag(customBase))
 
   useEffect(() => {
@@ -18,6 +16,7 @@ export const useBaseTag = (owner?: string, customBase?: string) => {
       const filter = {
         '#r': [url],
         kinds: [1],
+        authors: [getPublicKey(sk)],
       }
 
       let data = await db.events
@@ -44,13 +43,13 @@ export const useBaseTag = (owner?: string, customBase?: string) => {
           tags.push(ownerTag)
         }
         const unsignedRootEvent: UnsignedEvent = {
-          pubkey: getPublicKey(SK),
+          pubkey: getPublicKey(sk),
           created_at: Math.round(Date.now() / 1000),
           kind: 1,
           tags: tags,
           content: `Comments on ${url}` + (ownerTag ? ` by #[1]` : '') + ` ↴`,
         }
-        const rootEvent = signEvent(unsignedRootEvent, SK)
+        const rootEvent = signEvent(unsignedRootEvent, sk)
         setBaseTag({
           filter: { '#e': [rootEvent.id] },
           reference: ['e', rootEvent.id, '', 'root'],
@@ -60,7 +59,7 @@ export const useBaseTag = (owner?: string, customBase?: string) => {
     }
 
     fetch()
-  }, [owner, pool, relays])
+  }, [owner, pool, relays, sk])
 
   return baseTag
 }

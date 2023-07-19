@@ -3,6 +3,7 @@ import { Event, generatePrivateKey, getPublicKey, SimplePool, UnsignedEvent } fr
 import { createContext, ReactNode, useContext, useRef, useState } from 'react'
 
 const RELAYS = ['wss://relay.damus.io']
+const SK = '9532872e90549c5e1b453c307df4f5b7251fec04cec3a963cccb21dbc7b704c0'
 
 type Context = {
   publicKey?: string
@@ -10,6 +11,7 @@ type Context = {
   establishNostrKey: () => Promise<void>
   pool: SimplePool
   relays: string[]
+  sk: string
 }
 
 const NostrContext = createContext({} as Context)
@@ -58,6 +60,7 @@ export function NostrProvider({ children }: { children: ReactNode }) {
         signEventAsync,
         pool: poolRef.current,
         relays: RELAYS,
+        sk: SK,
       }}
     >
       {children}

@@ -50,7 +50,7 @@ export const useEvent = () => {
         message: `failed to publish event to any relay.`,
       })
       setLoading(false)
-    }, 8000)
+    }, 4000)
 
     const pub = pool.publish(relays, event)
     pub.on('ok', (relay: string) => {
