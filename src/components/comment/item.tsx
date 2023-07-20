@@ -1,6 +1,6 @@
 import { Menu } from '@/components/comment/menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { useMetadata } from '@/hooks/metadata'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -43,12 +43,12 @@ export function Item({ event, onDelete, isDisabled }: Props) {
               {dayjs(event.created_at * 1000).from(new Date())}
             </p>
           </div>
+          <div className="ml-auto font-medium">
+            <Menu onDelete={() => onDelete(event)} disabled={isDisabled(event)} />
+          </div>
         </div>
       </CardHeader>
       <CardContent>{event.content}</CardContent>
-      <CardFooter className="justify-end">
-        <Menu onDelete={() => onDelete(event)} disabled={isDisabled(event)} />
-      </CardFooter>
     </Card>
   )
 }

@@ -1,4 +1,4 @@
-import { MoreHorizontal, Trash } from 'lucide-react'
+import { MoreVertical, Trash } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +18,7 @@ export function Menu({ onDelete, disabled }: Props) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" disabled={disabled}>
-          <MoreHorizontal className="h-4 w-4" />
+          <MoreVertical className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
